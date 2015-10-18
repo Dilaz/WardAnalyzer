@@ -8,9 +8,10 @@
 </head>
 <body>
 	<h1><%= title %></h1>
-	<div id="map-wrapper">
-		<figure id="map">
-		</figure>
+	<div id="map-container">
+		<div id="map-wrapper">
+			<figure id="map"></figure>
+		</div>
 	</div>
 
 	<form id="teamform">
@@ -20,7 +21,7 @@
 		</div>
 		<div class="row">
 			<label for="matches">How many matches:</label>
-			<input type="number" name="matches" id="matches" value="10" step="5" min="5" />
+			<input type="number" name="matches" id="matches" value="10" min="1" />
 		</div>
 		<div class="row">
 			<label for="time">Time</label>
