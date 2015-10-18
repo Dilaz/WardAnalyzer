@@ -1,18 +1,41 @@
+var teams = {};
 jQuery('document').ready(function($) {
+	var hash = document.location.hash.substr(1);
+
+	if (hash) {
+		$('#teamname').val(hash);
+		setTimeout(function() {
+			$('#teamform').submit();
+		}, 0);
+	}
+
 	$('#teamform').submit(function(e) {
 		e.preventDefault();
+		document.location.hash = $('#teamname').val();
+		$('#map div').remove();
 		load();
 
 		$.getJSON('/team/?team=' + $('#teamname').val())
 		.then(function(data) {
 			stopload();
+			if (data.error) {
+				alert(data.error);
+				return;
+			}
+			else if (data.wards.length === 0) {
+				alert('Unknown team');
+				return;
+			}
+
 			$('h1').text(data.team);
 
 			var matches = {}
 			var limit = parseInt($('#matches').val(), 10);
 
 			data.wards.forEach(function(w) {
-				var match = matches[w.id] || {wards:[]};
+				var id = parseInt(w.match, 10);
+				var match = matches[id] || {wards:[]};
+
 				match.wards.push({
 					time: w.start,
 					x: (parseFloat(w.x) + 7500),
@@ -20,7 +43,7 @@ jQuery('document').ready(function($) {
 					type: w.type
 				});
 
-				matches[w.id] = match;
+				matches[id] = match;
 			});
 
 			var map = $('#map');
@@ -28,16 +51,14 @@ jQuery('document').ready(function($) {
 				var mulX = map.width() / 15000;
 				var mulY = map.height() / 15000;
 
-				Object.keys(matches).forEach(function(key) {
-					if (--limit <= 0) { return false; }
+				Object.keys(matches).sort().reverse().forEach(function(key) {
+					if (limit <= 0) { return false; }
+					limit--;
 
 					var match = matches[key];
-					console.log('before', match.wards.length);
-
 					match.wards.filter(function(ward) {
 						var time = parseFloat(ward.time);
 						var timeLimit = parseInt($('#time').val(), 10);
-						console.log(time, timeLimit);
 						switch (timeLimit) {
 							case 0:
 								return time <= 2;
@@ -51,19 +72,20 @@ jQuery('document').ready(function($) {
 							case 3:
 								return time > 40;
 							break;
+							default:
+								return true;
+							break;
 						}
-
-						return parseFloat(ward.time)
 					})
 					.forEach(function(ward) {
 						$('<div>').addClass('ward ' + ward.type.toLowerCase())
+						.attr('title', 'Match: ' + key + ' (' + [ward.x - 7500, ward.y - 7500].join(',') + ')')
 						.css({
-							left: (ward.x * mulX) + 'px',
-							top: (ward.y * mulY) + 'px',
+							left: ((ward.x / 15000) * 100) + '%',
+							bottom: ((ward.y / 15000) * 100) + '%',
 						})
 						.appendTo(map);
 					});
-					console.log('after',map.find('div').length);
 				});
 			});
 		});
