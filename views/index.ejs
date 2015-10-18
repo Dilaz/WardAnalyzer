@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title><%= title %></title>
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="/javascripts/app.js"></script>
+</head>
+<body>
+	<h1><%= title %></h1>
+	<div id="map-wrapper">
+		<figure id="map">
+		</figure>
+	</div>
+
+	<form id="teamform">
+		<div class="row">
+			<label for="teamname">Team name:</label>
+			<input type="text" name="team" id="teamname" value="alliance" />
+		</div>
+		<div class="row">
+			<label for="matches">How many matches:</label>
+			<input type="number" name="matches" id="matches" value="10" step="5" min="5" />
+		</div>
+		<div class="row">
+			<label for="time">Time</label>
+			<select name="time" id="time">
+				<option value="0">Start (before 2min)</option>
+				<option value="1">Earlygame (2-20min)</option>
+				<option value="2">Midgame (20-40min)</option>
+				<option value="3">Lategame (40- min)</option>
+			</select>
+		</div>
+		<input type="submit" value="Load" id="submit" />
+	</form>
+	<div class="loader"><img src="/images/ajax-loader.gif" alt="" /></div>
+</body>
+</html>
