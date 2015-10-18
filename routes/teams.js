@@ -3,7 +3,7 @@ var router = express.Router();
 var http = require('http');
 var cheerio = require('cheerio');
 var q = require('q');
-var debug = require('debug')('wardanalyzer')
+var debug = require('debug')('wardanalyzer');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -13,8 +13,16 @@ router.get('/', function(req, res, next) {
 		return next(new Error('Not found'));
 	}
 
+	// Make sure team exists
+	try {
+		var id = req.teams[team.replace(/[^a-z0-9 -_.,]/i, '').toLowerCase()];
+	}
+	catch (e) {
+		return res.json({error: 'Team not found'});
+	}
+
 	// Get the team
-	getTeamWars(team)
+	getTeamWars(id, team)
 	.then(function(data) {
 		return res.json(data);
 	})
@@ -24,8 +32,8 @@ router.get('/', function(req, res, next) {
 
 });
 
-function getTeamWars(team) {
-	var url = '/team.php?q=376&team=' + team + '&p=ward&ward=0&patch=0';
+function getTeamWars(id, team) {
+	var url = '/team.php?q=' + id + '&team=' + team + '&p=ward&ward=0&patch=0';
 	return q.promise(function(resolve, reject) {
 		http.get({
 			hostname: 'www.datdota.com',
